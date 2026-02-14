@@ -20,18 +20,18 @@ const Footer = () => {
           <div>
             <h4 className="font-serif text-lg font-semibold mb-4">Navigation</h4>
             <nav className="flex flex-col gap-2">
-              <p  className="text-sm text-gray-300 hover:text-primary transition-colors">
+              <a href="#" className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Accueil
-              </p>
-              <p  className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </a>
+              <a href="#instruments" className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Instruments
-              </p>
-              <p  className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </a>
+              <a href="#about" className="text-sm text-gray-300 hover:text-primary transition-colors">
                 À propos
-              </p>
-              <p className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </a>
+              <Link to={"/register"} className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Inscription
-              </p>
+              </Link>
             </nav>
           </div>
 
