@@ -5,7 +5,9 @@
 /* =========================
    THEME (Tailwind v4)
 ========================= */
-
+html {
+  scroll-behavior: smooth;
+}
 @theme {
   --color-background: hsl(30 50% 98%);
   --color-foreground: hsl(20 20% 15%);

@@ -9,10 +9,10 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { path: "/", label: "Accueil" },
-    { path: "/about", label: "À propos" },
-    { path: "/instruments", label: "Instruments" },
-    { path: "/contact", label: "Contact" },
+    { path: "#", label: "Accueil" },
+    { path: "#about", label: "À propos" },
+    { path: "#instruments", label: "Instruments" },
+    { path: "#contact", label: "Contact" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -27,9 +27,9 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link
+            <a
               key={link.path}
-              to={link.path}
+              href={link.path}
               className={`text-sm font-medium transition-colors hover:text-primary ${
                 isActive(link.path)
                   ? "text-primary"
@@ -37,7 +37,7 @@ const Header = () => {
               }`}
             >
               {link.label}
-            </Link>
+            </a>
           ))}
         </nav>
 
@@ -76,9 +76,9 @@ const Header = () => {
         <div className="md:hidden border-t border-border bg-background">
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.path}
-                to={link.path}
+                href={link.path}
                 onClick={() => setIsMenuOpen(false)}
                 className={`text-sm font-medium py-2 transition-colors ${
                   isActive(link.path)
@@ -87,7 +87,7 @@ const Header = () => {
                 }`}
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
               <Link to="/login" onClick={() => setIsMenuOpen(false)}>
