@@ -59,7 +59,7 @@ const instruments = [
 
 const Instruments = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <section id="instruments" className="min-h-screen flex flex-col">
       <main className="flex-1">
         {/* Hero */}
         <section className="py-20 bg-linear-to-b from-cream to-background">
@@ -121,12 +121,12 @@ const Instruments = () => {
                           <span>•</span>
                           <span>{instrument.students} élèves</span>
                         </div>
-                        {/* <Link to={`/instruments/${instrument.id}`}>
+                        {/* <Link to={`/instruments/${instrument.id}`}> */}
                           <Button className="gap-2 bg-primary hover:bg-primary/90">
                             Voir les cours
                             <ArrowRight className="h-4 w-4" />
                           </Button>
-                        </Link> */}
+                        {/* </Link> */}
                       </CardContent>
                     </div>
                   </div>
@@ -136,7 +136,7 @@ const Instruments = () => {
           </div>
         </section>
       </main>
-    </div>
+    </section>
   );
 };
 

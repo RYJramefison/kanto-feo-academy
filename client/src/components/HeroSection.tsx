@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-linear-to-br from-cream via-background to-coral-light/20">
+    <section id="home" className="relative min-h-[90vh] flex items-center overflow-hidden bg-linear-to-br from-cream via-background to-coral-light/20">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 text-8xl">🎵</div>
@@ -31,19 +31,17 @@ const HeroSection = () => {
               depuis chez vous. Des cours vidéo de qualité avec un suivi personnalisé.
             </p>
 
-            {/* <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to="/register">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              {/* <Link to="/register"> */}
                 <Button size="lg" className="gap-2 bg-primary hover:bg-primary/90 text-lg px-8">
                   <Play className="h-5 w-5" />
                   Commencer maintenant
                 </Button>
-              </Link>
-              <Link to="/instruments">
+              {/* </Link> */}
                 <Button size="lg" variant="outline" className="gap-2 text-lg px-8">
                   Découvrir les cours
                 </Button>
-              </Link>
-            </div> */}
+            </div>
 
             <div className="flex flex-wrap gap-8 justify-center lg:justify-start pt-8">
               <div className="text-center">

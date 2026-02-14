@@ -24,8 +24,8 @@ const CTASection = () => {
             Paiement sécurisé via Orange Money, Airtel Money ou MVola.
           </p>
 
-          {/* <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* <Link to="/register"> */}
               <Button 
                 size="lg" 
                 variant="secondary"
@@ -34,8 +34,8 @@ const CTASection = () => {
                 S'inscrire gratuitement
                 <ArrowRight className="h-5 w-5" />
               </Button>
-            </Link>
-            <Link to="/instruments">
+            {/* </Link> */}
+            {/* <Link to="/instruments"> */}
               <Button 
                 size="lg" 
                 variant="outline"
@@ -43,8 +43,8 @@ const CTASection = () => {
               >
                 Voir les cours
               </Button>
-            </Link>
-          </div> */}
+            {/* </Link> */}
+          </div>
 
           <p className="mt-6 text-sm opacity-75">
             ✓ Première leçon gratuite &nbsp;•&nbsp; ✓ Annulation facile &nbsp;•&nbsp; ✓ Paiement sécurisé

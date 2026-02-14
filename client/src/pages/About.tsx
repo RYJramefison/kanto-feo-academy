@@ -4,7 +4,7 @@ import { Target, Users, Award, Heart } from "lucide-react";
 
 const About = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <section id="about" className="min-h-screen flex flex-col">
       <main className="flex-1">
         {/* Hero */}
         <section className="py-20 bg-gradient-to-b from-cream to-background">
@@ -122,7 +122,7 @@ const About = () => {
           </div>
         </section>
       </main>
-    </div>
+    </section>
   );
 };
 
