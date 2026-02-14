@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo & About */}
           <div className="space-y-4">
-            <img src={logo} alt="Kanto-Feo Academy" className="h-16 w-auto brightness-0 invert" />
+            <img src={logo} alt="Kanto-Feo Academy" className="h-15 w-auto" />
             <p className="text-sm text-gray-300 leading-relaxed">
               Avelao hiteny ny talentanao - Laissez parler votre talent. 
               Apprenez la musique en ligne avec les meilleurs professeurs de Madagascar.
@@ -20,18 +20,18 @@ const Footer = () => {
           <div>
             <h4 className="font-serif text-lg font-semibold mb-4">Navigation</h4>
             <nav className="flex flex-col gap-2">
-              <Link to="/" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              <p  className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Accueil
-              </Link>
-              <Link to="/instruments" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </p>
+              <p  className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Instruments
-              </Link>
-              <Link to="/about" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </p>
+              <p  className="text-sm text-gray-300 hover:text-primary transition-colors">
                 À propos
-              </Link>
-              <Link to="/register" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </p>
+              <p className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Inscription
-              </Link>
+              </p>
             </nav>
           </div>
 
@@ -39,21 +39,21 @@ const Footer = () => {
           <div>
             <h4 className="font-serif text-lg font-semibold mb-4">Instruments</h4>
             <nav className="flex flex-col gap-2">
-              <Link to="/instruments/guitare" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              <p  className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Guitare
-              </Link>
-              <Link to="/instruments/piano" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </p>
+              <p className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Piano
-              </Link>
-              <Link to="/instruments/batterie" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </p>
+              <p className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Batterie
-              </Link>
-              <Link to="/instruments/violon" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </p>
+              <p className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Violon
-              </Link>
-              <Link to="/instruments/chant" className="text-sm text-gray-300 hover:text-primary transition-colors">
+              </p>
+              <p  className="text-sm text-gray-300 hover:text-primary transition-colors">
                 Chant
-              </Link>
+              </p>
             </nav>
           </div>
 
