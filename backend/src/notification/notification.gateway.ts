@@ -5,7 +5,11 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'http';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 export class NotificationGateway {
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): string {
