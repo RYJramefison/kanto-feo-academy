@@ -9,19 +9,24 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
-  async login(user: any) {
+  async login(user: {
+    email: string;
+    id: number;
+  }): Promise<{ access_token: string }> {
     const payload = { email: user.email, sub: user.id };
 
+    const accessToken = await this.jwtService.signAsync(payload);
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
     };
   }
 
-  async register(user: any) {
-    await this.mailService.sendMail(
-      user.email,
+  async register({ email }: { email: string }) {
+    await this.mailService.sendEmail(
+      email,
       'Welcome',
-      `Hello ${user.email}, your account is created`,
+      `Hello ${email}, your account is created`,
     );
   }
 }
