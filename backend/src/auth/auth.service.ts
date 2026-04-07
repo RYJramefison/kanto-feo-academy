@@ -17,13 +17,11 @@ export class AuthService {
     };
   }
 
-  async register() {
+  async register(user: any) {
     await this.mailService.sendMail(
-      'user@email.com',
+      user.email,
       'Welcome',
-      'Your account is created',
+      `Hello ${user.email}, your account is created`,
     );
-
-    return { message: 'User registered' };
   }
 }

@@ -14,12 +14,19 @@ export class MailService {
     });
   }
 
-  async sendMail(to: string, subject: string, text: string) {
-    return this.transporter.sendMail({
-      from: 'your@email.com',
-      to,
+  sendEmail(
+    toAddress: string,
+    subject: string,
+    messageText: string,
+  ): Promise<nodemailer.SentMessageInfo> {
+    const mailOptions = {
+      from: process.env.MAIL_ADDRESS,
+      to: toAddress,
       subject,
-      text,
-    });
+      text: messageText,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    return this.transporter.sendMail(mailOptions);
   }
 }
