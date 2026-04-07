@@ -11,3 +11,195 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// ================================
+// 🔹 ENUMS
+// ================================
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum PaymentStatus {
+  VALIDATED
+  PENDING
+  REJECTED
+}
+
+enum PaymentMethod {
+  ORANGE_MONEY
+  AIRTEL_MONEY
+  MVOLA
+}
+
+enum NotificationType {
+  REMINDER
+  CONFIRMATION
+  INFO
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+// ================================
+// 🔹 ADMIN
+// ================================
+
+model Admin {
+  admin_id Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  phone    String?
+  password String
+
+  students Student[]
+  courses  Course[]
+}
+
+// ================================
+// 🔹 INSTRUMENT
+// ================================
+
+model Instrument {
+  instrument_id Int    @id @default(autoincrement())
+  name          String
+  description   String?
+
+  students Student[]
+  courses  Course[]
+}
+
+// ================================
+// 🔹 STUDENT
+// ================================
+
+model Student {
+  student_id       Int          @id @default(autoincrement())
+  first_name       String?
+  last_name        String?
+  email            String       @unique
+  phone            String?
+  password         String
+  registration_date DateTime    @default(now())
+  current_level    CourseLevel?
+
+  instrument_id Int
+  admin_id      Int
+
+  instrument Instrument @relation(fields: [instrument_id], references: [instrument_id], onDelete: Restrict)
+  admin      Admin      @relation(fields: [admin_id], references: [admin_id], onDelete: SetNull)
+
+  enrollments Enrollment[]
+  payments    Payment[]
+  schedules   Schedule[]
+  progresses  Progress[]
+  notifications Notification[]
+}
+
+// ================================
+// 🔹 COURSE
+// ================================
+
+model Course {
+  course_id        Int          @id @default(autoincrement())
+  title            String
+  description      String?
+  level            CourseLevel?
+  video_url        String?
+  publication_date DateTime     @default(now())
+
+  instrument_id Int
+  admin_id      Int
+
+  instrument Instrument @relation(fields: [instrument_id], references: [instrument_id], onDelete: Cascade)
+  admin      Admin      @relation(fields: [admin_id], references: [admin_id], onDelete: SetNull)
+
+  enrollments Enrollment[]
+  progresses  Progress[]
+}
+
+// ================================
+// 🔹 ENROLLMENT (Many-to-Many)
+// ================================
+
+model Enrollment {
+  enrollment_id Int      @id @default(autoincrement())
+  enrollment_date DateTime @default(now())
+
+  student_id Int
+  course_id  Int
+
+  student Student @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+  course  Course  @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+
+  @@unique([student_id, course_id])
+}
+
+// ================================
+// 🔹 PAYMENT
+// ================================
+
+model Payment {
+  payment_id  Int           @id @default(autoincrement())
+  amount      Float
+  payment_date DateTime     @default(now())
+  status      PaymentStatus?
+  method      PaymentMethod?
+
+  student_id Int
+  student    Student @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+}
+
+// ================================
+// 🔹 SCHEDULE
+// ================================
+
+model Schedule {
+  schedule_id Int       @id @default(autoincrement())
+  day         DayOfWeek?
+  start_time  DateTime?
+  end_time    DateTime?
+
+  student_id Int
+  student    Student @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+}
+
+// ================================
+// 🔹 PROGRESS
+// ================================
+
+model Progress {
+  progress_id      Int          @id @default(autoincrement())
+  lesson_completed Boolean      @default(false)
+  validation_date  DateTime?
+  achieved_level   CourseLevel?
+
+  student_id Int
+  course_id  Int
+
+  student Student @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+  course  Course  @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+}
+
+// ================================
+// 🔹 NOTIFICATION
+// ================================
+
+model Notification {
+  notification_id Int             @id @default(autoincrement())
+  message         String?
+  sent_date       DateTime        @default(now())
+  type            NotificationType?
+
+  student_id Int
+  student    Student @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+}
