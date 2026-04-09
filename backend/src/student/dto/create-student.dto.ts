@@ -1,30 +1,8 @@
-import {
-  IsEmail,
-  IsOptional,
-  IsString,
-  IsEnum,
-  IsNumber,
-  MinLength,
-} from 'class-validator';
+import { IsEnum, IsNumber, MinLength, IsOptional } from 'class-validator';
 import { CourseLevel } from '../../common/enums/course-level.enum';
+import { CreatePersonDto } from '../../common/dto/create-person.dto';
 
-export class CreateStudentDto {
-  @IsOptional()
-  @IsString()
-  first_name?: string;
-
-  @IsOptional()
-  @IsString()
-  last_name?: string;
-
-  @IsEmail()
-  email!: string;
-
-  @IsOptional()
-  @IsString()
-  phone?: string;
-
-  @IsString()
+export class CreateStudentDto extends CreatePersonDto {
   @MinLength(6)
   password!: string;
 

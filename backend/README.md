@@ -1,29 +1,51 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Kanto-FEO Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API pour l'application Kanto-FEO développée avec NestJS.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Technologies utilisées
 
-## Description
+### Framework principal
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **NestJS** v11.0.1 - Framework Node.js TypeScript
+- **TypeScript** v5.7.3 - Superset JavaScript avec typage statique
+
+### Base de données
+
+- **Prisma** v5.6.0 - ORM et toolkit de base de données
+- **Prisma Client** v5.6.0 - Client de base de données généré
+- **Prisma Adapter PostgreSQL** v7.7.0 - Adaptateur PostgreSQL
+
+### Authentification & Sécurité
+
+- **@nestjs/jwt** v11.0.2 - Gestion des tokens JWT
+- **@nestjs/passport** v11.0.5 - Stratégies d'authentification
+- **passport** v0.7.0 - Middleware d'authentification
+- **passport-jwt** v4.0.1 - Stratégie JWT pour Passport
+- **bcrypt** v6.0.0 - Hashage de mots de passe
+
+### API & Documentation
+
+- **@nestjs/swagger** v11.2.6 - Documentation API automatique
+- **class-validator** v0.15.1 - Validation des DTOs
+- **class-transformer** v0.5.1 - Transformation des données
+
+### WebSocket
+
+- **@nestjs/platform-socket.io** v11.1.17 - Support WebSocket
+- **@nestjs/websockets** v11.1.17 - Module WebSockets
+
+### Utilitaires
+
+- **nodemailer** v8.0.3 - Envoi d'emails
+- **js-yaml** v4.1.1 - Parseur YAML
+- **rxjs** v7.8.1 - Programmation réactive
+
+## Spécification API
+
+La spécification complète de l'API se trouve dans le fichier :
+**`api-specification.yaml`**
+
+Ce fichier contient la documentation OpenAPI/Swagger de tous les endpoints, modèles de données et schémas de l'API.
 
 ## Project setup
 

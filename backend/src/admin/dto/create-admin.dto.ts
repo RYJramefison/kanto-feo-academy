@@ -1,17 +1,7 @@
-import { IsString, IsOptional, IsEmail, MinLength } from 'class-validator';
+import { MinLength } from 'class-validator';
+import { CreatePersonDto } from '../../common/dto/create-person.dto';
 
-export class CreateAdminDto {
-  @IsString()
-  name!: string;
-
-  @IsEmail()
-  email!: string;
-
-  @IsString()
-  @IsOptional()
-  phone?: string;
-
-  @IsString()
+export class CreateAdminDto extends CreatePersonDto {
   @MinLength(6)
   password!: string;
 }

@@ -51,15 +51,31 @@ enum DayOfWeek {
 }
 
 // ================================
+// 🔹 PERSON (Base Entity)
+// ================================
+
+model Person {
+  person_id         Int        @id @default(autoincrement())
+  first_name        String?
+  last_name         String?
+  email             String     @unique
+  phone             String?
+  password          String
+  registration_date DateTime   @default(now())
+
+  admin   Admin?
+  student Student?
+}
+
+// ================================
 // 🔹 ADMIN
 // ================================
 
 model Admin {
-  admin_id Int     @id @default(autoincrement())
-  name     String
-  email    String  @unique
-  phone    String?
-  password String
+  admin_id Int @id @default(autoincrement())
+  person_id Int @unique
+
+  person Person @relation(fields: [person_id], references: [person_id], onDelete: Cascade)
 
   students Student[]
   courses  Course[]
@@ -83,18 +99,14 @@ model Instrument {
 // ================================
 
 model Student {
-  student_id       Int          @id @default(autoincrement())
-  first_name       String?
-  last_name        String?
-  email            String       @unique
-  phone            String?
-  password         String
-  registration_date DateTime    @default(now())
-  current_level    CourseLevel?
+  student_id    Int          @id @default(autoincrement())
+  person_id    Int          @unique
+  current_level CourseLevel?
 
   instrument_id Int
   admin_id      Int
 
+  person     Person     @relation(fields: [person_id], references: [person_id], onDelete: Cascade)
   instrument Instrument @relation(fields: [instrument_id], references: [instrument_id], onDelete: Restrict)
   admin      Admin      @relation(fields: [admin_id], references: [admin_id], onDelete: Cascade)
 

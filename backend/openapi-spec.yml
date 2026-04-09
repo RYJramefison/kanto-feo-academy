@@ -1219,14 +1219,22 @@ components:
         admin_id:
           type: integer
           readOnly: true
-        name:
+        first_name:
           type: string
+          nullable: true
+        last_name:
+          type: string
+          nullable: true
         email:
           type: string
           format: email
         phone:
           type: string
           nullable: true
+        registration_date:
+          type: string
+          format: date-time
+          readOnly: true
         students:
           type: array
           items:
@@ -1239,12 +1247,15 @@ components:
     CreateAdminDto:
       type: object
       required:
-        - name
         - email
         - password
       properties:
-        name:
+        first_name:
           type: string
+          nullable: true
+        last_name:
+          type: string
+          nullable: true
         email:
           type: string
           format: email
@@ -1258,8 +1269,12 @@ components:
     UpdateAdminDto:
       type: object
       properties:
-        name:
+        first_name:
           type: string
+          nullable: true
+        last_name:
+          type: string
+          nullable: true
         email:
           type: string
           format: email
