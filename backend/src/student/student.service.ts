@@ -61,11 +61,19 @@ export class StudentService {
         p.registration_date,
         s.current_level,
         i.name as instrument_name,
-        a.admin_id
+        json_build_object(
+          'admin_id', a.admin_id,
+          'first_name', ap.first_name,
+          'last_name', ap.last_name,
+          'email', ap.email,
+          'phone', ap.phone,
+          'registration_date', ap.registration_date
+        ) as admin
       FROM "Student" s
       JOIN "Person" p ON s.person_id = p.person_id
       LEFT JOIN "Instrument" i ON s.instrument_id = i.instrument_id
       LEFT JOIN "Admin" a ON s.admin_id = a.admin_id
+      LEFT JOIN "Person" ap ON a.person_id = ap.person_id
     `;
   }
 
@@ -80,11 +88,19 @@ export class StudentService {
         p.registration_date,
         s.current_level,
         i.name as instrument_name,
-        a.admin_id
+        json_build_object(
+          'admin_id', a.admin_id,
+          'first_name', ap.first_name,
+          'last_name', ap.last_name,
+          'email', ap.email,
+          'phone', ap.phone,
+          'registration_date', ap.registration_date
+        ) as admin
       FROM "Student" s
       JOIN "Person" p ON s.person_id = p.person_id
       LEFT JOIN "Instrument" i ON s.instrument_id = i.instrument_id
       LEFT JOIN "Admin" a ON s.admin_id = a.admin_id
+      LEFT JOIN "Person" ap ON a.person_id = ap.person_id
       WHERE s.student_id = ${id}
     `;
   }
@@ -100,12 +116,20 @@ export class StudentService {
         p.registration_date,
         s.current_level,
         i.name as instrument_name,
-        a.admin_id,
-        p.password
+        p.password,
+        json_build_object(
+          'admin_id', a.admin_id,
+          'first_name', ap.first_name,
+          'last_name', ap.last_name,
+          'email', ap.email,
+          'phone', ap.phone,
+          'registration_date', ap.registration_date
+        ) as admin
       FROM "Student" s
       JOIN "Person" p ON s.person_id = p.person_id
       LEFT JOIN "Instrument" i ON s.instrument_id = i.instrument_id
       LEFT JOIN "Admin" a ON s.admin_id = a.admin_id
+      LEFT JOIN "Person" ap ON a.person_id = ap.person_id
       WHERE p.email = ${email}
     `;
   }
