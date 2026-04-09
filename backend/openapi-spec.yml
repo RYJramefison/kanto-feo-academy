@@ -1,0 +1,1812 @@
+openapi: 3.0.3
+info:
+  title: Kanto-Feo Academy API
+  description: API pour la gestion de l'académie de musique Kanto-Feo
+  version: 1.0.0
+  contact:
+    name: Kanto-Feo Team
+    email: support@kanto-feo.com
+
+servers:
+  - url: http://localhost:3000
+    description: Serveur de développement
+  - url: https://api.kanto-feo.com
+    description: Serveur de production
+
+paths:
+  /admin:
+    get:
+      tags:
+        - Admin
+      summary: Récupérer tous les administrateurs
+      description: Retourne la liste de tous les administrateurs avec leurs étudiants et cours
+      responses:
+        '200':
+          description: Liste des administrateurs récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Admin'
+    post:
+      tags:
+        - Admin
+      summary: Créer un nouvel administrateur
+      description: Crée un nouvel administrateur avec hashage du mot de passe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminDto'
+      responses:
+        '201':
+          description: Administrateur créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '400':
+          description: Données invalides
+        '409':
+          description: Email déjà utilisé
+
+  /admin/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Récupérer un administrateur par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Administrateur trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '404':
+          description: Administrateur non trouvé
+    patch:
+      tags:
+        - Admin
+      summary: Mettre à jour un administrateur
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAdminDto'
+      responses:
+        '200':
+          description: Administrateur mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '404':
+          description: Administrateur non trouvé
+    delete:
+      tags:
+        - Admin
+      summary: Supprimer un administrateur
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Administrateur supprimé
+        '404':
+          description: Administrateur non trouvé
+
+  /admin/email/{email}:
+    get:
+      tags:
+        - Admin
+      summary: Récupérer un administrateur par email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: Administrateur trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '404':
+          description: Administrateur non trouvé
+
+  /student:
+    get:
+      tags:
+        - Student
+      summary: Récupérer tous les étudiants
+      description: Retourne la liste de tous les étudiants avec leurs relations
+      responses:
+        '200':
+          description: Liste des étudiants récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+    post:
+      tags:
+        - Student
+      summary: Créer un nouvel étudiant
+      description: Crée un nouvel étudiant avec hashage du mot de passe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStudentDto'
+      responses:
+        '201':
+          description: Étudiant créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Données invalides
+        '409':
+          description: Email déjà utilisé
+
+  /student/{id}:
+    get:
+      tags:
+        - Student
+      summary: Récupérer un étudiant par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Étudiant trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          description: Étudiant non trouvé
+    patch:
+      tags:
+        - Student
+      summary: Mettre à jour un étudiant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStudentDto'
+      responses:
+        '200':
+          description: Étudiant mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          description: Étudiant non trouvé
+    delete:
+      tags:
+        - Student
+      summary: Supprimer un étudiant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Étudiant supprimé
+        '404':
+          description: Étudiant non trouvé
+
+  /student/email/{email}:
+    get:
+      tags:
+        - Student
+      summary: Récupérer un étudiant par email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: Étudiant trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          description: Étudiant non trouvé
+
+  /instrument:
+    get:
+      tags:
+        - Instrument
+      summary: Récupérer tous les instruments
+      responses:
+        '200':
+          description: Liste des instruments récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instrument'
+    post:
+      tags:
+        - Instrument
+      summary: Créer un nouvel instrument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInstrumentDto'
+      responses:
+        '201':
+          description: Instrument créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instrument'
+
+  /instrument/{id}:
+    get:
+      tags:
+        - Instrument
+      summary: Récupérer un instrument par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Instrument trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instrument'
+        '404':
+          description: Instrument non trouvé
+    patch:
+      tags:
+        - Instrument
+      summary: Mettre à jour un instrument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInstrumentDto'
+      responses:
+        '200':
+          description: Instrument mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instrument'
+        '404':
+          description: Instrument non trouvé
+    delete:
+      tags:
+        - Instrument
+      summary: Supprimer un instrument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Instrument supprimé
+        '404':
+          description: Instrument non trouvé
+
+  /course:
+    get:
+      tags:
+        - Course
+      summary: Récupérer tous les cours
+      responses:
+        '200':
+          description: Liste des cours récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+    post:
+      tags:
+        - Course
+      summary: Créer un nouveau cours
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseDto'
+      responses:
+        '201':
+          description: Cours créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+
+  /course/{id}:
+    get:
+      tags:
+        - Course
+      summary: Récupérer un cours par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cours trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '404':
+          description: Cours non trouvé
+    patch:
+      tags:
+        - Course
+      summary: Mettre à jour un cours
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCourseDto'
+      responses:
+        '200':
+          description: Cours mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '404':
+          description: Cours non trouvé
+    delete:
+      tags:
+        - Course
+      summary: Supprimer un cours
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Cours supprimé
+        '404':
+          description: Cours non trouvé
+
+  /course/level/{level}:
+    get:
+      tags:
+        - Course
+      summary: Récupérer les cours par niveau
+      parameters:
+        - name: level
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/CourseLevel'
+      responses:
+        '200':
+          description: Liste des cours par niveau
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+
+  /course/instrument/{instrumentId}:
+    get:
+      tags:
+        - Course
+      summary: Récupérer les cours par instrument
+      parameters:
+        - name: instrumentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des cours par instrument
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+
+  /payment:
+    get:
+      tags:
+        - Payment
+      summary: Récupérer tous les paiements
+      responses:
+        '200':
+          description: Liste des paiements récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+    post:
+      tags:
+        - Payment
+      summary: Créer un nouveau paiement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentDto'
+      responses:
+        '201':
+          description: Paiement créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  /payment/{id}:
+    get:
+      tags:
+        - Payment
+      summary: Récupérer un paiement par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Paiement trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Paiement non trouvé
+    patch:
+      tags:
+        - Payment
+      summary: Mettre à jour un paiement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentDto'
+      responses:
+        '200':
+          description: Paiement mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Paiement non trouvé
+    delete:
+      tags:
+        - Payment
+      summary: Supprimer un paiement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Paiement supprimé
+        '404':
+          description: Paiement non trouvé
+
+  /payment/student/{studentId}:
+    get:
+      tags:
+        - Payment
+      summary: Récupérer les paiements d'un étudiant
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des paiements de l'étudiant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+  /payment/status/{status}:
+    get:
+      tags:
+        - Payment
+      summary: Récupérer les paiements par statut
+      parameters:
+        - name: status
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/PaymentStatus'
+      responses:
+        '200':
+          description: Liste des paiements par statut
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+  /enrollment:
+    get:
+      tags:
+        - Enrollment
+      summary: Récupérer toutes les inscriptions
+      responses:
+        '200':
+          description: Liste des inscriptions récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Enrollment'
+    post:
+      tags:
+        - Enrollment
+      summary: Créer une nouvelle inscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEnrollmentDto'
+      responses:
+        '201':
+          description: Inscription créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+
+  /enrollment/{id}:
+    get:
+      tags:
+        - Enrollment
+      summary: Récupérer une inscription par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Inscription trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+        '404':
+          description: Inscription non trouvée
+    patch:
+      tags:
+        - Enrollment
+      summary: Mettre à jour une inscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEnrollmentDto'
+      responses:
+        '200':
+          description: Inscription mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+        '404':
+          description: Inscription non trouvée
+    delete:
+      tags:
+        - Enrollment
+      summary: Supprimer une inscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Inscription supprimée
+        '404':
+          description: Inscription non trouvée
+
+  /enrollment/student/{studentId}:
+    get:
+      tags:
+        - Enrollment
+      summary: Récupérer les inscriptions d'un étudiant
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des inscriptions de l'étudiant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Enrollment'
+
+  /enrollment/course/{courseId}:
+    get:
+      tags:
+        - Enrollment
+      summary: Récupérer les inscriptions à un cours
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des inscriptions au cours
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Enrollment'
+
+  /enrollment/student/{studentId}/course/{courseId}:
+    get:
+      tags:
+        - Enrollment
+      summary: Récupérer une inscription spécifique
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Inscription trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+        '404':
+          description: Inscription non trouvée
+
+  /schedule:
+    get:
+      tags:
+        - Schedule
+      summary: Récupérer tous les emplois du temps
+      responses:
+        '200':
+          description: Liste des emplois du temps récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+    post:
+      tags:
+        - Schedule
+      summary: Créer un nouvel emploi du temps
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScheduleDto'
+      responses:
+        '201':
+          description: Emploi du temps créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+
+  /schedule/{id}:
+    get:
+      tags:
+        - Schedule
+      summary: Récupérer un emploi du temps par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Emploi du temps trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '404':
+          description: Emploi du temps non trouvé
+    patch:
+      tags:
+        - Schedule
+      summary: Mettre à jour un emploi du temps
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScheduleDto'
+      responses:
+        '200':
+          description: Emploi du temps mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '404':
+          description: Emploi du temps non trouvé
+    delete:
+      tags:
+        - Schedule
+      summary: Supprimer un emploi du temps
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Emploi du temps supprimé
+        '404':
+          description: Emploi du temps non trouvé
+
+  /schedule/student/{studentId}:
+    get:
+      tags:
+        - Schedule
+      summary: Récupérer les emplois du temps d'un étudiant
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des emplois du temps de l'étudiant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+
+  /schedule/day/{day}:
+    get:
+      tags:
+        - Schedule
+      summary: Récupérer les emplois du temps par jour
+      parameters:
+        - name: day
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/DayOfWeek'
+      responses:
+        '200':
+          description: Liste des emplois du temps par jour
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+
+  /progress:
+    get:
+      tags:
+        - Progress
+      summary: Récupérer tous les progrès
+      responses:
+        '200':
+          description: Liste des progrès récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progress'
+    post:
+      tags:
+        - Progress
+      summary: Créer un nouveau suivi de progrès
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProgressDto'
+      responses:
+        '201':
+          description: Progrès créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progress'
+
+  /progress/{id}:
+    get:
+      tags:
+        - Progress
+      summary: Récupérer un progrès par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Progrès trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progress'
+        '404':
+          description: Progrès non trouvé
+    patch:
+      tags:
+        - Progress
+      summary: Mettre à jour un progrès
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProgressDto'
+      responses:
+        '200':
+          description: Progrès mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progress'
+        '404':
+          description: Progrès non trouvé
+    delete:
+      tags:
+        - Progress
+      summary: Supprimer un progrès
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Progrès supprimé
+        '404':
+          description: Progrès non trouvé
+
+  /progress/student/{studentId}:
+    get:
+      tags:
+        - Progress
+      summary: Récupérer les progrès d'un étudiant
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des progrès de l'étudiant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progress'
+
+  /progress/course/{courseId}:
+    get:
+      tags:
+        - Progress
+      summary: Récupérer les progrès pour un cours
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des progrès pour le cours
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progress'
+
+  /progress/student/{studentId}/course/{courseId}:
+    get:
+      tags:
+        - Progress
+      summary: Récupérer les progrès d'un étudiant pour un cours
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des progrès de l'étudiant pour le cours
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progress'
+
+  /notification:
+    get:
+      tags:
+        - Notification
+      summary: Récupérer toutes les notifications
+      responses:
+        '200':
+          description: Liste des notifications récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+    post:
+      tags:
+        - Notification
+      summary: Créer une nouvelle notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNotificationDto'
+      responses:
+        '201':
+          description: Notification créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+
+  /notification/{id}:
+    get:
+      tags:
+        - Notification
+      summary: Récupérer une notification par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '404':
+          description: Notification non trouvée
+    patch:
+      tags:
+        - Notification
+      summary: Mettre à jour une notification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNotificationDto'
+      responses:
+        '200':
+          description: Notification mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '404':
+          description: Notification non trouvée
+    delete:
+      tags:
+        - Notification
+      summary: Supprimer une notification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Notification supprimée
+        '404':
+          description: Notification non trouvée
+
+  /notification/student/{studentId}:
+    get:
+      tags:
+        - Notification
+      summary: Récupérer les notifications d'un étudiant
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des notifications de l'étudiant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+  /notification/type/{type}:
+    get:
+      tags:
+        - Notification
+      summary: Récupérer les notifications par type
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/NotificationType'
+      responses:
+        '200':
+          description: Liste des notifications par type
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+components:
+  schemas:
+    Admin:
+      type: object
+      properties:
+        admin_id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        students:
+          type: array
+          items:
+            $ref: '#/components/schemas/Student'
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+
+    CreateAdminDto:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        password:
+          type: string
+          format: password
+
+    UpdateAdminDto:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        password:
+          type: string
+          format: password
+
+    Student:
+      type: object
+      properties:
+        student_id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        registration_date:
+          type: string
+          format: date-time
+          readOnly: true
+        current_level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        instrument:
+          $ref: '#/components/schemas/Instrument'
+        admin:
+          $ref: '#/components/schemas/Admin'
+        enrollments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Enrollment'
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        schedules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Schedule'
+        progresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Progress'
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+
+    CreateStudentDto:
+      type: object
+      required:
+        - email
+        - password
+        - instrument_id
+        - admin_id
+      properties:
+        first_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        password:
+          type: string
+          format: password
+        current_level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        instrument_id:
+          type: integer
+        admin_id:
+          type: integer
+
+    UpdateStudentDto:
+      type: object
+      properties:
+        first_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        password:
+          type: string
+          format: password
+        current_level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        instrument_id:
+          type: integer
+        admin_id:
+          type: integer
+
+    Instrument:
+      type: object
+      properties:
+        instrument_id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        students:
+          type: array
+          items:
+            $ref: '#/components/schemas/Student'
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+
+    CreateInstrumentDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+
+    UpdateInstrumentDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+
+    Course:
+      type: object
+      properties:
+        course_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        video_url:
+          type: string
+          nullable: true
+        publication_date:
+          type: string
+          format: date-time
+          readOnly: true
+        instrument:
+          $ref: '#/components/schemas/Instrument'
+        admin:
+          $ref: '#/components/schemas/Admin'
+        enrollments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Enrollment'
+        progresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Progress'
+
+    CreateCourseDto:
+      type: object
+      required:
+        - title
+        - instrument_id
+        - admin_id
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        video_url:
+          type: string
+          nullable: true
+        instrument_id:
+          type: integer
+        admin_id:
+          type: integer
+
+    UpdateCourseDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        video_url:
+          type: string
+          nullable: true
+        instrument_id:
+          type: integer
+        admin_id:
+          type: integer
+
+    Payment:
+      type: object
+      properties:
+        payment_id:
+          type: integer
+          readOnly: true
+        amount:
+          type: number
+          format: float
+        payment_date:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+          nullable: true
+        method:
+          $ref: '#/components/schemas/PaymentMethod'
+          nullable: true
+        student:
+          $ref: '#/components/schemas/Student'
+
+    CreatePaymentDto:
+      type: object
+      required:
+        - amount
+        - student_id
+      properties:
+        amount:
+          type: number
+          format: float
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+          nullable: true
+        method:
+          $ref: '#/components/schemas/PaymentMethod'
+          nullable: true
+        student_id:
+          type: integer
+
+    UpdatePaymentDto:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: float
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+          nullable: true
+        method:
+          $ref: '#/components/schemas/PaymentMethod'
+          nullable: true
+        student_id:
+          type: integer
+
+    Enrollment:
+      type: object
+      properties:
+        enrollment_id:
+          type: integer
+          readOnly: true
+        enrollment_date:
+          type: string
+          format: date-time
+          readOnly: true
+        student:
+          $ref: '#/components/schemas/Student'
+        course:
+          $ref: '#/components/schemas/Course'
+
+    CreateEnrollmentDto:
+      type: object
+      required:
+        - student_id
+        - course_id
+      properties:
+        student_id:
+          type: integer
+        course_id:
+          type: integer
+
+    UpdateEnrollmentDto:
+      type: object
+      properties:
+        student_id:
+          type: integer
+        course_id:
+          type: integer
+
+    Schedule:
+      type: object
+      properties:
+        schedule_id:
+          type: integer
+          readOnly: true
+        day:
+          $ref: '#/components/schemas/DayOfWeek'
+          nullable: true
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        student:
+          $ref: '#/components/schemas/Student'
+
+    CreateScheduleDto:
+      type: object
+      required:
+        - student_id
+      properties:
+        day:
+          $ref: '#/components/schemas/DayOfWeek'
+          nullable: true
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        student_id:
+          type: integer
+
+    UpdateScheduleDto:
+      type: object
+      properties:
+        day:
+          $ref: '#/components/schemas/DayOfWeek'
+          nullable: true
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        student_id:
+          type: integer
+
+    Progress:
+      type: object
+      properties:
+        progress_id:
+          type: integer
+          readOnly: true
+        lesson_completed:
+          type: boolean
+          default: false
+        validation_date:
+          type: string
+          format: date-time
+          nullable: true
+        achieved_level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        student:
+          $ref: '#/components/schemas/Student'
+        course:
+          $ref: '#/components/schemas/Course'
+
+    CreateProgressDto:
+      type: object
+      required:
+        - student_id
+        - course_id
+      properties:
+        lesson_completed:
+          type: boolean
+          default: false
+        validation_date:
+          type: string
+          format: date-time
+          nullable: true
+        achieved_level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        student_id:
+          type: integer
+        course_id:
+          type: integer
+
+    UpdateProgressDto:
+      type: object
+      properties:
+        lesson_completed:
+          type: boolean
+        validation_date:
+          type: string
+          format: date-time
+          nullable: true
+        achieved_level:
+          $ref: '#/components/schemas/CourseLevel'
+          nullable: true
+        student_id:
+          type: integer
+        course_id:
+          type: integer
+
+    Notification:
+      type: object
+      properties:
+        notification_id:
+          type: integer
+          readOnly: true
+        message:
+          type: string
+          nullable: true
+        sent_date:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/NotificationType'
+          nullable: true
+        student:
+          $ref: '#/components/schemas/Student'
+
+    CreateNotificationDto:
+      type: object
+      required:
+        - student_id
+      properties:
+        message:
+          type: string
+          nullable: true
+        type:
+          $ref: '#/components/schemas/NotificationType'
+          nullable: true
+        student_id:
+          type: integer
+
+    UpdateNotificationDto:
+      type: object
+      properties:
+        message:
+          type: string
+          nullable: true
+        type:
+          $ref: '#/components/schemas/NotificationType'
+          nullable: true
+        student_id:
+          type: integer
+
+    # Enums
+    CourseLevel:
+      type: string
+      enum:
+        - BEGINNER
+        - INTERMEDIATE
+        - ADVANCED
+
+    PaymentStatus:
+      type: string
+      enum:
+        - VALIDATED
+        - PENDING
+        - REJECTED
+
+    PaymentMethod:
+      type: string
+      enum:
+        - ORANGE_MONEY
+        - AIRTEL_MONEY
+        - MVOLA
+
+    NotificationType:
+      type: string
+      enum:
+        - REMINDER
+        - CONFIRMATION
+        - INFO
+
+    DayOfWeek:
+      type: string
+      enum:
+        - MONDAY
+        - TUESDAY
+        - WEDNESDAY
+        - THURSDAY
+        - FRIDAY
+        - SATURDAY
+        - SUNDAY
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Admin
+    description: Gestion des administrateurs
+  - name: Student
+    description: Gestion des étudiants
+  - name: Instrument
+    description: Gestion des instruments
+  - name: Course
+    description: Gestion des cours
+  - name: Payment
+    description: Gestion des paiements
+  - name: Enrollment
+    description: Gestion des inscriptions
+  - name: Schedule
+    description: Gestion des emplois du temps
+  - name: Progress
+    description: Suivi des progrès
+  - name: Notification
+    description: Gestion des notifications
