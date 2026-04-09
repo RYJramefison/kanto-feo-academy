@@ -4,12 +4,12 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ================================
@@ -96,7 +96,7 @@ model Student {
   admin_id      Int
 
   instrument Instrument @relation(fields: [instrument_id], references: [instrument_id], onDelete: Restrict)
-  admin      Admin      @relation(fields: [admin_id], references: [admin_id], onDelete: SetNull)
+  admin      Admin      @relation(fields: [admin_id], references: [admin_id], onDelete: Cascade)
 
   enrollments Enrollment[]
   payments    Payment[]
@@ -121,7 +121,7 @@ model Course {
   admin_id      Int
 
   instrument Instrument @relation(fields: [instrument_id], references: [instrument_id], onDelete: Cascade)
-  admin      Admin      @relation(fields: [admin_id], references: [admin_id], onDelete: SetNull)
+  admin      Admin      @relation(fields: [admin_id], references: [admin_id], onDelete: Cascade)
 
   enrollments Enrollment[]
   progresses  Progress[]
