@@ -12,12 +12,12 @@ import { Server } from 'http';
 })
 export class NotificationGateway {
   @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
+  handleMessage(_client: any, _payload: any): string {
     return 'Hello world!';
   }
 
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   sendNotification(message: string) {
     this.server.emit('notification', message);
