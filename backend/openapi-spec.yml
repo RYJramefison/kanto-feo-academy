@@ -14,6 +14,60 @@ servers:
     description: Serveur de production
 
 paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Connexion utilisateur
+      description: Authentifie un utilisateur (admin ou student) et retourne un token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Inscription utilisateur
+      description: Crée un nouvel utilisateur (admin ou student) avec hashage du mot de passe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDto'
+      responses:
+        '201':
+          description: Utilisateur créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+
   /admin:
     get:
       tags:
@@ -1712,6 +1766,118 @@ components:
         course_id:
           type: integer
 
+    LoginDto:
+      type: object
+      required:
+        - email
+        - password
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          description: Adresse email de l'utilisateur
+        password:
+          type: string
+          format: password
+          description: Mot de passe de l'utilisateur
+        role:
+          type: string
+          enum:
+            - admin
+            - student
+          description: Rôle de l'utilisateur
+
+    RegisterDto:
+      type: object
+      required:
+        - email
+        - password
+        - role
+      properties:
+        first_name:
+          type: string
+          nullable: true
+          description: Prénom de l'utilisateur
+        last_name:
+          type: string
+          nullable: true
+          description: Nom de l'utilisateur
+        email:
+          type: string
+          format: email
+          description: Adresse email de l'utilisateur
+        phone:
+          type: string
+          nullable: true
+          description: Numéro de téléphone
+        password:
+          type: string
+          format: password
+          description: Mot de passe de l'utilisateur
+        role:
+          type: string
+          enum:
+            - admin
+            - student
+          description: Rôle de l'utilisateur
+        current_level:
+          type: string
+          nullable: true
+          description: Niveau actuel (pour les étudiants)
+        instrument_id:
+          type: integer
+          nullable: true
+          description: ID de l'instrument (pour les étudiants)
+        admin_id:
+          type: integer
+          nullable: true
+          description: ID de l'admin (pour les étudiants)
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: Token JWT d'authentification
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID de l'utilisateur (admin_id ou student_id)
+        email:
+          type: string
+          format: email
+          description: Adresse email
+        role:
+          type: string
+          enum:
+            - admin
+            - student
+          description: Rôle de l'utilisateur
+        firstName:
+          type: string
+          nullable: true
+          description: Prénom
+        lastName:
+          type: string
+          nullable: true
+          description: Nom
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur
+        statusCode:
+          type: integer
+          description: Code d'erreur HTTP
+
     Notification:
       type: object
       properties:
@@ -1807,6 +1973,8 @@ security:
   - bearerAuth: []
 
 tags:
+  - name: Auth
+    description: Authentification des utilisateurs
   - name: Admin
     description: Gestion des administrateurs
   - name: Student
