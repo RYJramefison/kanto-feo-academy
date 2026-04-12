@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,22 +9,28 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Music, Calendar, Clock, CreditCard, ArrowRight, Check } from "lucide-react";
 import BackToHome from "@/layout/BackToHome";
+import { authService } from "@/services/authService";
+import { instrumentService } from "@/services/instrumentService";
+import { enrollmentService } from "@/services/enrollmentService";
+import { scheduleService } from "@/services/scheduleService";
+import { paymentService } from "@/services/paymentService";
+import type { Instrument, CreateStudentDto } from "@/types";
+import { PaymentMethod, DayOfWeek } from "@/types";
+import { toast } from "sonner";
 
-const instruments = [
-  { id: "guitare", name: "Guitare", emoji: "🎸" },
-  { id: "piano", name: "Piano", emoji: "🎹" },
-  { id: "batterie", name: "Batterie", emoji: "🥁" },
-  { id: "violon", name: "Violon", emoji: "🎻" },
-  { id: "chant", name: "Chant", emoji: "🎤" },
+const paymentMethods = [
+  { id: "orange", name: "Orange Money", value: PaymentMethod.ORANGE_MONEY, emoji: "🟠" },
+  { id: "airtel", name: "Airtel Money", value: PaymentMethod.AIRTEL_MONEY, emoji: "🔴" },
+  { id: "mvola", name: "MVola", value: PaymentMethod.MVOLA, emoji: "🟡" },
 ];
 
 const days = [
-  { id: "lundi", name: "Lundi" },
-  { id: "mardi", name: "Mardi" },
-  { id: "mercredi", name: "Mercredi" },
-  { id: "jeudi", name: "Jeudi" },
-  { id: "vendredi", name: "Vendredi" },
-  { id: "samedi", name: "Samedi" },
+  { id: "lundi", name: "Lundi", value: DayOfWeek.MONDAY },
+  { id: "mardi", name: "Mardi", value: DayOfWeek.TUESDAY },
+  { id: "mercredi", name: "Mercredi", value: DayOfWeek.WEDNESDAY },
+  { id: "jeudi", name: "Jeudi", value: DayOfWeek.THURSDAY },
+  { id: "vendredi", name: "Vendredi", value: DayOfWeek.FRIDAY },
+  { id: "samedi", name: "Samedi", value: DayOfWeek.SATURDAY },
 ];
 
 const timeSlots = [
@@ -32,23 +38,128 @@ const timeSlots = [
 ];
 
 const Register = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [selectedInstrument, setSelectedInstrument] = useState("");
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [instruments, setInstruments] = useState<Instrument[]>([]);
+  
+  // Form data
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    age: "",
+    password: "",
+    selectedInstrument: "",
+    selectedDays: [] as string[],
+    selectedTime: "",
+    paymentMethod: ""
+  });
+
+  useEffect(() => {
+    loadInstruments();
+  }, []);
+
+  const loadInstruments = async () => {
+    console.log('Register.tsx - Début du chargement des instruments');
+    try {
+      console.log('Register.tsx - Appel à instrumentService.getAll()');
+      const data = await instrumentService.getAll();
+      console.log('Register.tsx - Données reçues du service:', data);
+      console.log('Register.tsx - Nombre d\'instruments:', data.length);
+      setInstruments(data);
+      console.log('Register.tsx - Instruments state mis à jour');
+    } catch (error) {
+      console.error('Register.tsx - Erreur lors du chargement:', error);
+      toast.error('Erreur lors du chargement des instruments');
+    }
+  };
 
   const toggleDay = (dayId: string) => {
-    setSelectedDays(prev => 
-      prev.includes(dayId) 
-        ? prev.filter(d => d !== dayId)
-        : [...prev, dayId]
-    );
+    setFormData(prev => ({
+      ...prev,
+      selectedDays: prev.selectedDays.includes(dayId)
+        ? prev.selectedDays.filter(d => d !== dayId)
+        : [...prev.selectedDays, dayId]
+    }));
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      // Create student
+      const studentData: CreateStudentDto = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        age: formData.age ? parseInt(formData.age) : undefined,
+        password: formData.password
+      };
+      
+      const authResponse = await authService.register(studentData);
+      authService.setToken(authResponse.access_token);
+      
+      // Create enrollment
+      const instrument = instruments.find(i => i.id.toString() === formData.selectedInstrument);
+      if (instrument) {
+        // Get first course for the instrument
+        const courses = await instrumentService.getCourses(instrument.id);
+        if (courses.length > 0) {
+          await enrollmentService.create({
+            studentId: authResponse.user.id,
+            courseId: courses[0].id
+          });
+        }
+      }
+      
+      // Create schedules
+      for (const dayId of formData.selectedDays) {
+        const day = days.find(d => d.id === dayId);
+        if (day && formData.selectedTime) {
+          await scheduleService.create({
+            studentId: authResponse.user.id,
+            dayOfWeek: day.value,
+            timeSlot: formData.selectedTime
+          });
+        }
+      }
+      
+      // Create payment
+      if (formData.paymentMethod) {
+        const paymentMethod = paymentMethods.find(p => p.id === formData.paymentMethod);
+        if (paymentMethod) {
+          await paymentService.create({
+            amount: 50000, // 50 000 Ar
+            method: paymentMethod.value,
+            studentId: authResponse.user.id
+          });
+        }
+      }
+      
+      toast.success('Inscription réussie ! Redirection vers votre tableau de bord...');
+      setTimeout(() => navigate('/dashboard'), 2000);
+      
+    } catch (error) {
+      console.error('Registration error:', error);
+      const errorMessage = error && typeof error === 'object' && 'response' in error 
+        ? (error as { response?: { data?: { message?: string } }}).response?.data?.message 
+        : 'Erreur lors de l\'inscription';
+      toast.error(errorMessage || 'Erreur lors de l\'inscription');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <BackToHome />
-      <main className="flex-1 bg-gradient-to-b from-cream to-background py-12">
+      <main className="flex-1 bg-linear-to-b from-cream to-background py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             {/* Header */}
@@ -91,35 +202,59 @@ const Register = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Prénom</Label>
-                      <Input placeholder="Votre prénom" />
+                      <Input 
+                        placeholder="Votre prénom" 
+                        value={formData.firstName}
+                        onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label>Nom</Label>
-                      <Input placeholder="Votre nom" />
+                      <Input 
+                        placeholder="Votre nom" 
+                        value={formData.lastName}
+                        onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        required
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label>Email</Label>
-                    <Input type="email" placeholder="votre@email.mg" />
+                    <Input 
+                      type="email" 
+                      placeholder="votre@email.mg" 
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Téléphone</Label>
-                    <Input placeholder="+261 34 XX XXX XX" />
+                    <Input 
+                      placeholder="+261 34 XX XXX XX" 
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Âge</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez votre tranche d'âge" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="moins-12">Moins de 12 ans</SelectItem>
-                        <SelectItem value="12-17">12 - 17 ans</SelectItem>
-                        <SelectItem value="18-25">18 - 25 ans</SelectItem>
-                        <SelectItem value="26-35">26 - 35 ans</SelectItem>
-                        <SelectItem value="plus-35">Plus de 35 ans</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input 
+                      type="number" 
+                      placeholder="Votre âge" 
+                      value={formData.age}
+                      onChange={(e) => handleInputChange('age', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Mot de passe</Label>
+                    <Input 
+                      type="password" 
+                      placeholder="Choisissez un mot de passe" 
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
+                      required
+                    />
                   </div>
                   <Button onClick={() => setStep(2)} className="w-full gap-2 bg-primary hover:bg-primary/90">
                     Continuer
@@ -140,20 +275,20 @@ const Register = () => {
                   <CardDescription>Quel instrument souhaitez-vous apprendre ?</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <RadioGroup value={selectedInstrument} onValueChange={setSelectedInstrument}>
+                  <RadioGroup value={formData.selectedInstrument} onValueChange={(value) => handleInputChange('selectedInstrument', value)}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {instruments.map((instrument) => (
                         <div key={instrument.id}>
                           <RadioGroupItem 
-                            value={instrument.id} 
-                            id={instrument.id}
+                            value={instrument.id.toString()} 
+                            id={instrument.id.toString()}
                             className="peer sr-only"
                           />
                           <Label
-                            htmlFor={instrument.id}
+                            htmlFor={instrument.id.toString()}
                             className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 cursor-pointer transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 hover:border-primary/50"
                           >
-                            <span className="text-4xl">{instrument.emoji}</span>
+                            <span className="text-4xl">🎵</span>
                             <span className="font-semibold">{instrument.name}</span>
                           </Label>
                         </div>
@@ -166,7 +301,7 @@ const Register = () => {
                     </Button>
                     <Button 
                       onClick={() => setStep(3)} 
-                      disabled={!selectedInstrument}
+                      disabled={!formData.selectedInstrument}
                       className="flex-1 gap-2 bg-primary hover:bg-primary/90"
                     >
                       Continuer
@@ -196,12 +331,12 @@ const Register = () => {
                           key={day.id}
                           onClick={() => toggleDay(day.id)}
                           className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                            selectedDays.includes(day.id) 
+                            formData.selectedDays.includes(day.id) 
                               ? 'border-primary bg-primary/5' 
                               : 'hover:border-primary/50'
                           }`}
                         >
-                          <Checkbox checked={selectedDays.includes(day.id)} />
+                          <Checkbox checked={formData.selectedDays.includes(day.id)} />
                           <span className="font-medium">{day.name}</span>
                         </div>
                       ))}
@@ -213,7 +348,7 @@ const Register = () => {
                       <Clock className="h-5 w-5 text-primary" />
                       Heure de disponibilité
                     </Label>
-                    <Select>
+                    <Select value={formData.selectedTime} onValueChange={(value) => handleInputChange('selectedTime', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionnez une heure" />
                       </SelectTrigger>
@@ -231,7 +366,7 @@ const Register = () => {
                     </Button>
                     <Button 
                       onClick={() => setStep(4)} 
-                      disabled={selectedDays.length === 0}
+                      disabled={formData.selectedDays.length === 0 || !formData.selectedTime}
                       className="flex-1 gap-2 bg-primary hover:bg-primary/90"
                     >
                       Continuer
@@ -253,55 +388,29 @@ const Register = () => {
                   <CardDescription>Choisissez votre méthode de paiement préférée</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <RadioGroup value={formData.paymentMethod} onValueChange={(value) => handleInputChange('paymentMethod', value)}>
                     <div className="space-y-4">
-                      <div>
-                        <RadioGroupItem value="orange" id="orange" className="peer sr-only" />
-                        <Label
-                          htmlFor="orange"
-                          className="flex items-center gap-4 p-6 rounded-xl border-2 cursor-pointer transition-all peer-data-[state=checked]:border-orange-500 peer-data-[state=checked]:bg-orange-50 hover:border-orange-300"
-                        >
-                          <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold">
-                            OM
-                          </div>
-                          <div>
-                            <p className="font-semibold">Orange Money</p>
-                            <p className="text-sm text-muted-foreground">Paiement mobile rapide et sécurisé</p>
-                          </div>
-                        </Label>
-                      </div>
-
-                      <div>
-                        <RadioGroupItem value="airtel" id="airtel" className="peer sr-only" />
-                        <Label
-                          htmlFor="airtel"
-                          className="flex items-center gap-4 p-6 rounded-xl border-2 cursor-pointer transition-all peer-data-[state=checked]:border-red-500 peer-data-[state=checked]:bg-red-50 hover:border-red-300"
-                        >
-                          <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold">
-                            AM
-                          </div>
-                          <div>
-                            <p className="font-semibold">Airtel Money</p>
-                            <p className="text-sm text-muted-foreground">Transfert mobile simple et fiable</p>
-                          </div>
-                        </Label>
-                      </div>
-
-                      <div>
-                        <RadioGroupItem value="mvola" id="mvola" className="peer sr-only" />
-                        <Label
-                          htmlFor="mvola"
-                          className="flex items-center gap-4 p-6 rounded-xl border-2 cursor-pointer transition-all peer-data-[state=checked]:border-yellow-500 peer-data-[state=checked]:bg-yellow-50 hover:border-yellow-300"
-                        >
-                          <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center text-charcoal font-bold">
-                            MV
-                          </div>
-                          <div>
-                            <p className="font-semibold">MVola</p>
-                            <p className="text-sm text-muted-foreground">Paiement Telma mobile</p>
-                          </div>
-                        </Label>
-                      </div>
+                      {paymentMethods.map((method) => (
+                        <div key={method.id}>
+                          <RadioGroupItem value={method.id} id={method.id} className="peer sr-only" />
+                          <Label
+                            htmlFor={method.id}
+                            className={`flex items-center gap-4 p-6 rounded-xl border-2 cursor-pointer transition-all peer-data-[state=checked]:border-${method.id === 'orange' ? 'orange-500' : method.id === 'airtel' ? 'red-500' : 'yellow-500'} peer-data-[state=checked]:bg-${method.id === 'orange' ? 'orange' : method.id === 'airtel' ? 'red' : 'yellow'}-50 hover:border-${method.id === 'orange' ? 'orange' : method.id === 'airtel' ? 'red' : 'yellow'}-300`}
+                          >
+                            <div className={`w-12 h-12 bg-${method.id === 'orange' ? 'orange-500' : method.id === 'airtel' ? 'red-600' : 'yellow-500'} rounded-lg flex items-center justify-center text-white font-bold`}>
+                              {method.emoji}
+                            </div>
+                            <div>
+                              <p className="font-semibold">{method.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {method.id === 'orange' ? 'Paiement mobile rapide et sécurisé' : 
+                                 method.id === 'airtel' ? 'Transfert mobile simple et fiable' : 
+                                 'Paiement Telma mobile'}
+                              </p>
+                            </div>
+                          </Label>
+                        </div>
+                      ))}
                     </div>
                   </RadioGroup>
 
@@ -312,13 +421,13 @@ const Register = () => {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Instrument</span>
                         <span className="font-medium">
-                          {instruments.find(i => i.id === selectedInstrument)?.name || '-'}
+                          {instruments.find(i => i.id.toString() === formData.selectedInstrument)?.name || '-'}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Jours de cours</span>
                         <span className="font-medium">
-                          {selectedDays.length} jour(s)/semaine
+                          {formData.selectedDays.length} jour(s)/semaine
                         </span>
                       </div>
                       <div className="border-t border-border my-3" />
@@ -334,11 +443,21 @@ const Register = () => {
                       Retour
                     </Button>
                     <Button 
-                      disabled={!paymentMethod}
+                      disabled={!formData.paymentMethod || loading}
+                      onClick={handleSubmit}
                       className="flex-1 gap-2 bg-primary hover:bg-primary/90"
                     >
-                      <Check className="h-4 w-4" />
-                      Confirmer l'inscription
+                      {loading ? (
+                        <>
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          Traitement...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="h-4 w-4" />
+                          Confirmer l'inscription
+                        </>
+                      )}
                     </Button>
                   </div>
 
