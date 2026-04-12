@@ -1,20 +1,52 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Music, Mail, Lock, ArrowRight } from "lucide-react";
 import BackToHome from "@/layout/BackToHome";
+import { authService } from "@/services/authService";
+import type { LoginDto } from "@/types";
+import { toast } from "sonner";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const credentials: LoginDto = {
+        email: email.trim(),
+        password
+      };
+      
+      const authResponse = await authService.login(credentials);
+      authService.setToken(authResponse.access_token);
+      
+      toast.success('Connexion réussie ! Redirection vers votre tableau de bord...');
+      setTimeout(() => navigate('/dashboard'), 1500);
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      const errorMessage = error && typeof error === 'object' && 'response' in error 
+        ? (error as { response?: { data?: { message?: string } }}).response?.data?.message 
+        : 'Erreur lors de la connexion';
+      toast.error(errorMessage || 'Email ou mot de passe incorrect');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
       <BackToHome />
-      <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-cream to-background py-12">
+      <main className="flex-1 flex items-center justify-center bg-linear-to-b from-cream to-background py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto">
             <Card className="border-2">
@@ -28,6 +60,7 @@ const Login = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
@@ -57,9 +90,22 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-                <Button className="w-full gap-2 bg-primary hover:bg-primary/90">
-                  Se connecter
-                  <ArrowRight className="h-4 w-4" />
+                <Button 
+                  type="submit"
+                  disabled={loading || !email || !password}
+                  className="w-full gap-2 bg-primary hover:bg-primary/90"
+                >
+                  {loading ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Connexion...
+                    </>
+                  ) : (
+                    <>
+                      Se connecter
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </Button>
 
                 <div className="relative">
@@ -77,6 +123,7 @@ const Login = () => {
                     S'inscrire gratuitement
                   </Link>
                 </p>
+                </form>
               </CardContent>
             </Card>
           </div>
