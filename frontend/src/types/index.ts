@@ -1,12 +1,22 @@
-export interface Student {
-  id: number;
-  firstName: string;
-  lastName: string;
+export interface Admin {
+  admin_id: number;
+  first_name: string;
+  last_name: string;
   email: string;
   phone?: string;
-  age?: number;
-  createdAt: string;
-  updatedAt: string;
+  registration_date: string;
+}
+
+export interface Student {
+  student_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  registration_date: string;
+  current_level?: CourseLevel;
+  instrument?: Instrument;
+  admin?: Admin;
   enrollments?: Enrollment[];
   payments?: Payment[];
   schedules?: Schedule[];
@@ -14,12 +24,14 @@ export interface Student {
 }
 
 export interface CreateStudentDto {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone?: string;
-  age?: number;
   password: string;
+  current_level?: CourseLevel;
+  instrument_id: number;
+  admin_id: number;
 }
 
 export interface UpdateStudentDto {
@@ -278,9 +290,21 @@ export const NotificationType = {
 export type NotificationType =
   (typeof NotificationType)[keyof typeof NotificationType];
 
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  registrationDate?: string;
+  currentLevel?: CourseLevel;
+  instrument?: Instrument;
+  admin?: Admin;
+}
+
 export interface AuthResponse {
   access_token: string;
-  user: Student | Admin;
+  user: User;
 }
 
 export interface LoginDto {

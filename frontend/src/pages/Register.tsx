@@ -11,11 +11,8 @@ import { Music, Calendar, Clock, CreditCard, ArrowRight, Check } from "lucide-re
 import BackToHome from "@/layout/BackToHome";
 import { authService } from "@/services/authService";
 import { instrumentService } from "@/services/instrumentService";
-import { enrollmentService } from "@/services/enrollmentService";
-import { scheduleService } from "@/services/scheduleService";
-import { paymentService } from "@/services/paymentService";
 import type { Instrument, CreateStudentDto } from "@/types";
-import { PaymentMethod, DayOfWeek } from "@/types";
+import { PaymentMethod, DayOfWeek, CourseLevel } from "@/types";
 import { toast } from "sonner";
 
 const paymentMethods = [
@@ -52,6 +49,7 @@ const Register = () => {
     age: "",
     password: "",
     selectedInstrument: "",
+    selectedLevel: "",
     selectedDays: [] as string[],
     selectedTime: "",
     paymentMethod: ""
@@ -92,58 +90,26 @@ const Register = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Get first admin (for now, we'll use admin_id = 2 as it exists in the database)
+      const adminId = 2;
+      
       // Create student
       const studentData: CreateStudentDto = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
-        age: formData.age ? parseInt(formData.age) : undefined,
-        password: formData.password
+        password: formData.password,
+        current_level: formData.selectedLevel as CourseLevel || undefined,
+        instrument_id: parseInt(formData.selectedInstrument),
+        admin_id: adminId
       };
       
       const authResponse = await authService.register(studentData);
       authService.setToken(authResponse.access_token);
       
-      // Create enrollment
-      const instrument = instruments.find(i => i.id.toString() === formData.selectedInstrument);
-      if (instrument) {
-        // Get first course for the instrument
-        const courses = await instrumentService.getCourses(instrument.id);
-        if (courses.length > 0) {
-          await enrollmentService.create({
-            studentId: authResponse.user.id,
-            courseId: courses[0].id
-          });
-        }
-      }
-      
-      // Create schedules
-      for (const dayId of formData.selectedDays) {
-        const day = days.find(d => d.id === dayId);
-        if (day && formData.selectedTime) {
-          await scheduleService.create({
-            studentId: authResponse.user.id,
-            dayOfWeek: day.value,
-            timeSlot: formData.selectedTime
-          });
-        }
-      }
-      
-      // Create payment
-      if (formData.paymentMethod) {
-        const paymentMethod = paymentMethods.find(p => p.id === formData.paymentMethod);
-        if (paymentMethod) {
-          await paymentService.create({
-            amount: 50000, // 50 000 Ar
-            method: paymentMethod.value,
-            studentId: authResponse.user.id
-          });
-        }
-      }
-      
-      toast.success('Inscription réussie ! Redirection vers votre tableau de bord...');
-      setTimeout(() => navigate('/dashboard'), 2000);
+      toast.success('Inscription réussie !');
+      navigate('/login');
       
     } catch (error) {
       console.error('Registration error:', error);
@@ -174,14 +140,14 @@ const Register = () => {
 
             {/* Progress Steps */}
             <div className="flex items-center justify-center gap-4 mb-10">
-              {[1, 2, 3, 4].map((s) => (
+              {[1, 2, 3, 4, 5].map((s) => (
                 <div key={s} className="flex items-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                     step >= s ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
                   }`}>
                     {step > s ? <Check className="h-5 w-5" /> : s}
                   </div>
-                  {s < 4 && (
+                  {s < 5 && (
                     <div className={`w-12 h-1 ${step > s ? 'bg-primary' : 'bg-muted'}`} />
                   )}
                 </div>
@@ -312,8 +278,85 @@ const Register = () => {
               </Card>
             )}
 
-            {/* Step 3: Schedule */}
+            {/* Step 3: Choose Level */}
             {step === 3 && (
+              <Card className="border-2">
+                <CardHeader>
+                  <CardTitle className="font-serif flex items-center gap-2">
+                    <Music className="h-6 w-6 text-primary" />
+                    Quel est votre niveau ?
+                  </CardTitle>
+                  <CardDescription>Sélectionnez votre niveau actuel</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <RadioGroup value={formData.selectedLevel} onValueChange={(value) => handleInputChange('selectedLevel', value)}>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <RadioGroupItem 
+                          value={CourseLevel.BEGINNER} 
+                          id="beginner"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="beginner"
+                          className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 cursor-pointer transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 hover:border-primary/50"
+                        >
+                          <span className="text-3xl"> beginner</span>
+                          <span className="font-semibold">Débutant</span>
+                          <span className="text-sm text-muted-foreground text-center">Je débute totalement</span>
+                        </Label>
+                      </div>
+                      <div>
+                        <RadioGroupItem 
+                          value={CourseLevel.INTERMEDIATE} 
+                          id="intermediate"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="intermediate"
+                          className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 cursor-pointer transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 hover:border-primary/50"
+                        >
+                          <span className="text-3xl"> intermediate</span>
+                          <span className="font-semibold">Intermédiaire</span>
+                          <span className="text-sm text-muted-foreground text-center">J'ai déjà des bases</span>
+                        </Label>
+                      </div>
+                      <div>
+                        <RadioGroupItem 
+                          value={CourseLevel.ADVANCED} 
+                          id="advanced"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="advanced"
+                          className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 cursor-pointer transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 hover:border-primary/50"
+                        >
+                          <span className="text-3xl"> advanced</span>
+                          <span className="font-semibold">Avancé</span>
+                          <span className="text-sm text-muted-foreground text-center">Je suis expérimenté</span>
+                        </Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                  <div className="flex gap-4">
+                    <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                      Retour
+                    </Button>
+                    <Button 
+                      onClick={() => setStep(4)} 
+                      disabled={!formData.selectedLevel}
+                      className="flex-1 gap-2 bg-primary hover:bg-primary/90"
+                    >
+                      Continuer
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Step 4: Schedule */}
+            {step === 4 && (
               <Card className="border-2">
                 <CardHeader>
                   <CardTitle className="font-serif flex items-center gap-2">
@@ -361,11 +404,11 @@ const Register = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                    <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
                       Retour
                     </Button>
                     <Button 
-                      onClick={() => setStep(4)} 
+                      onClick={() => setStep(5)} 
                       disabled={formData.selectedDays.length === 0 || !formData.selectedTime}
                       className="flex-1 gap-2 bg-primary hover:bg-primary/90"
                     >
@@ -377,8 +420,8 @@ const Register = () => {
               </Card>
             )}
 
-            {/* Step 4: Payment */}
-            {step === 4 && (
+            {/* Step 5: Payment */}
+            {step === 5 && (
               <Card className="border-2">
                 <CardHeader>
                   <CardTitle className="font-serif flex items-center gap-2">
@@ -439,7 +482,7 @@ const Register = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
+                    <Button variant="outline" onClick={() => setStep(4)} className="flex-1">
                       Retour
                     </Button>
                     <Button 

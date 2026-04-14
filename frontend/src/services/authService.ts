@@ -1,5 +1,10 @@
 import { api } from "../lib/api";
-import type { AuthResponse, LoginDto, CreateStudentDto } from "../types";
+import type {
+  AuthResponse,
+  LoginDto,
+  CreateStudentDto,
+  Student,
+} from "../types";
 
 export const authService = {
   async login(credentials: LoginDto): Promise<AuthResponse> {
@@ -8,11 +13,39 @@ export const authService = {
   },
 
   async register(studentData: CreateStudentDto): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>(
-      "/auth/register",
-      studentData,
-    );
-    return response.data;
+    // Convert CreateStudentDto to RegisterDto format for backend
+    const registerData = {
+      first_name: studentData.firstName,
+      last_name: studentData.lastName,
+      email: studentData.email,
+      phone: studentData.phone,
+      password: studentData.password,
+      role: "student" as const,
+      current_level: studentData.current_level,
+      instrument_id: studentData.instrument_id,
+      admin_id: studentData.admin_id,
+    };
+
+    const response = await api.post<Student>("/auth/register", registerData);
+    // Transform backend data to frontend format
+    const backendStudent = response.data;
+    const frontendStudent = {
+      id: backendStudent.student_id,
+      firstName: backendStudent.first_name,
+      lastName: backendStudent.last_name,
+      email: backendStudent.email,
+      phone: backendStudent.phone,
+      registrationDate: backendStudent.registration_date,
+      currentLevel: backendStudent.current_level,
+      instrument: backendStudent.instrument,
+      admin: backendStudent.admin,
+    };
+
+    // Create a mock AuthResponse since the backend doesn't return tokens
+    return {
+      access_token: "mock_token_" + Date.now(),
+      user: frontendStudent,
+    };
   },
 
   async logout(): Promise<void> {
