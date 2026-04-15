@@ -9,11 +9,13 @@ import BackToHome from "@/layout/BackToHome";
 import { authService } from "@/services/authService";
 import type { LoginDto } from "@/types";
 import { toast } from "sonner";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"admin" | "student">("student");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +25,8 @@ const Login = () => {
     try {
       const credentials: LoginDto = {
         email: email.trim(),
-        password
+        password,
+        role
       };
       
       const authResponse = await authService.login(credentials);
@@ -56,11 +59,30 @@ const Login = () => {
                 </div>
                 <CardTitle className="font-serif text-2xl">Connexion</CardTitle>
                 <CardDescription>
-                  Accédez à votre espace élève Kanto-Feo Academy
+                  Accédez à votre espace Kanto-Feo Academy
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold">Type de compte</Label>
+                  <RadioGroup value={role} onValueChange={(value) => setRole(value as "admin" | "student")}>
+                    <div className="flex gap-4">
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="student" id="student" />
+                        <Label htmlFor="student" className="cursor-pointer">
+                          Étudiant
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="admin" id="admin" />
+                        <Label htmlFor="admin" className="cursor-pointer">
+                          Administrateur
+                        </Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </div>
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
